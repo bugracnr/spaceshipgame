@@ -296,49 +296,49 @@ public:
 
 
 			// Ship movement
-			if (GetKey(olc::W).bHeld && GetKey(olc::A).bHeld) // upper left
-			{
-				shipX -= shipSpeed * fElapsedTime;
-				shipY -= shipSpeed * fElapsedTime;
+			//if (GetKey(olc::W).bHeld && GetKey(olc::A).bHeld) // upper left
+			//{
+			//	shipX -= shipSpeed * fElapsedTime;
+			//	shipY -= shipSpeed * fElapsedTime;
 
-				if (shipX <= 0)
-				{
-					shipX = 0;
-				}
-				else if (shipY <= 0)
-				{
-					shipY = 0;
-				}
+			//	if (shipX <= 0)
+			//	{
+			//		shipX = 0;
+			//	}
+			//	else if (shipY <= 0)
+			//	{
+			//		shipY = 0;
+			//	}
 
-			}
-			else if (GetKey(olc::W).bHeld && GetKey(olc::D).bHeld) // upper right
+			//}
+			//else if (GetKey(olc::W).bHeld && GetKey(olc::D).bHeld) // upper right
+			//{
+			//	shipX += shipSpeed * fElapsedTime;
+			//	shipY -= shipSpeed * fElapsedTime;
+			//}
+			//else if (GetKey(olc::S).bHeld && GetKey(olc::A).bHeld) // lower left
+			//{
+			//	shipX -= shipSpeed * fElapsedTime;
+			//	shipY += shipSpeed * fElapsedTime;
+			//}
+			//else if (GetKey(olc::S).bHeld && GetKey(olc::D).bHeld) // lower right
+			//{
+			//	shipX += shipSpeed * fElapsedTime;
+			//	shipY += shipSpeed * fElapsedTime;
+			//}
+			if (GetKey(olc::W).bHeld) // up
 			{
-				shipX += shipSpeed * fElapsedTime;
 				shipY -= shipSpeed * fElapsedTime;
 			}
-			else if (GetKey(olc::S).bHeld && GetKey(olc::A).bHeld) // lower left
-			{
-				shipX -= shipSpeed * fElapsedTime;
-				shipY += shipSpeed * fElapsedTime;
-			}
-			else if (GetKey(olc::S).bHeld && GetKey(olc::D).bHeld) // lower right
-			{
-				shipX += shipSpeed * fElapsedTime;
-				shipY += shipSpeed * fElapsedTime;
-			}
-			else if (GetKey(olc::W).bHeld) // up
-			{
-				shipY -= shipSpeed * fElapsedTime;
-			}
-			else if (GetKey(olc::A).bHeld) // right
+			if (GetKey(olc::A).bHeld) // right
 			{
 				shipX -= shipSpeed * fElapsedTime;
 			}
-			else if (GetKey(olc::S).bHeld) // down
+			if (GetKey(olc::S).bHeld) // down
 			{
 				shipY += shipSpeed * fElapsedTime;
 			}
-			else if (GetKey(olc::D).bHeld) // left
+			if (GetKey(olc::D).bHeld) // left
 			{
 				shipX += shipSpeed * fElapsedTime;
 			}
