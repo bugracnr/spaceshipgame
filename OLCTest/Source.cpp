@@ -13,9 +13,10 @@
 
 
 
-class Example : public olc::PixelGameEngine
+class SpaceGame : public olc::PixelGameEngine
 {
 	olc::Sprite* shipSprite;
+	olc::Sprite* boxSprite;
 	olc::Sprite* enemySprite;
 	olc::Sprite* asteroidSprite;
 	olc::Sprite* rBulletSprite;
@@ -31,6 +32,12 @@ class Example : public olc::PixelGameEngine
 	int shipDimX = 23;
 	int shipDimY = 25;
 
+	// box
+	double boxX, boxY;
+	bool bBox = false;
+	bool nuclear = false;
+	int boxDimX = 30;
+	int boxDimY = 20;
 
 
 	// bullet
@@ -80,7 +87,7 @@ public:
 	bool OnUserCreate() //override
 	{
 		shipSprite = new olc::Sprite("Sprites/spaceship.png");		
-
+		boxSprite = new olc::Sprite("Sprites/box.png");
 		return true;
 	}
 	bool OnUserUpdate(float fElapsedTime) //override
@@ -89,7 +96,6 @@ public:
 		Clear(olc::DARK_GREEN);
 		SetPixelMode(olc::Pixel::ALPHA);
 		//Drawing the background
-
 
 		if (gameOver) // game over screen
 		{
@@ -102,6 +108,10 @@ public:
 			DrawString(50, 200, "YOU HAVE SURVIVED " + std::to_string(totalTime) + " SECONDS");
 
 			DrawString(50, 250, "PRESS E TO EXIT");
+
+			// Throws exception when ship crashes 
+			// delete shipSprite;
+			// Throws exception when ship crashes 
 
 			if (GetKey(olc::E).bPressed)
 				return false;
@@ -128,7 +138,54 @@ public:
 				shipY = 400 - shipDimY;
 
 
+			// if there exists a box
+			if (bBox) {
+				DrawSprite(boxX, boxY, boxSprite, 1);
+			}
+
+			if (nuclear) {
+
+				DrawString(80, 10, "Nuclear weapon is activated");
+				DrawString(75, 30, "Press 'shift' to kill'em all");
+
+				if (GetKey(olc::SHIFT).bPressed) {
+					if (bAsteroid) {
+						bAsteroid = false;
+						delete asteroidSprite;
+						bAstExplosion = true;
+						asteroidExplosionTime = totalTime;
+						astExplosionX = asteroidX;
+						astExplosionY = asteroidY;
+
+						astExpSprite = new olc::Sprite("Sprites/exp2.png");
+						DrawSprite(astExplosionX, astExplosionY, astExpSprite, 1);
+					}
+
+					if (bEnemy) {
+						bEnemy = false;
+						delete enemySprite;
+						bExplosion = true;
+						enemyExplosionTime = totalTime;
+						explosionX = enemyX;
+						explosionY = enemyY;
+
+						explosionSprite = new olc::Sprite("Sprites/explosion.png");
+						DrawSprite(explosionX, explosionY, explosionSprite, 1);
+					}
+					nuclear = false;
+				}
+			}
+
 			// if there exists an asteroid
+			if (!bAsteroid)
+			{
+				bAsteroid = true;
+				asteroidY = rand() % (400 - asteroidDimY);
+				asteroidX = 400;
+				asteroidSprite = new olc::Sprite("Sprites/asteroid.png");
+				DrawSprite(asteroidX, asteroidY, asteroidSprite, 1);
+			}
+
 			if (bAsteroid)
 			{
 				// collision 
@@ -175,7 +232,7 @@ public:
 
 
 						// draw explosion
-						bAstExplosion = 1;
+						bAstExplosion = true;
 
 						astExplosionX = asteroidX;
 						astExplosionY = asteroidY;
@@ -191,10 +248,20 @@ public:
 				if (totalTime - asteroidExplosionTime > 0.5)
 				{
 					delete astExpSprite;
-					bAstExplosion = 0;
+					bAstExplosion = false;
 				}
 				else
 					DrawSprite(astExplosionX, astExplosionY, astExpSprite, 1);
+			}
+						
+		
+			if (!bEnemy)
+			{
+				bEnemy = true;
+				enemyY = rand() % (400 - enemyDimY);
+				enemyX = 400;
+				enemySprite = new olc::Sprite("Sprites/enemy.png");
+				DrawSprite(enemyX, enemyY, enemySprite, 1);
 			}
 
 			if (bEnemy)
@@ -207,26 +274,18 @@ public:
 					shipX > enemyX - shipDimX + 1 &&
 					shipX < enemyX + enemyDimX - shipDimX)
 				{
-					gameOver = 1;
+					gameOver = true;
 				}
+
 
 				DrawSprite(enemyX, enemyY, enemySprite, 1);
 
-
-				if (enemyX < double(rand() % 400) && bAsteroid == 0)
-				{
-					bAsteroid = 1;					
-					asteroidY = rand() % (400 - asteroidDimY);
-					asteroidX = 400;
-					asteroidSprite = new olc::Sprite("Sprites/asteroid.png");
-					DrawSprite(asteroidX, asteroidY, asteroidSprite, 1);
-				}
-
-
-				if (enemyX <= -2 * enemyDimX)
+	
+				
+				if (enemyX <=  - 2* enemyDimX)
 				{
 					delete enemySprite;
-					bEnemy = 0;
+					bEnemy = false;
 				}
 
 				if (bBullet)
@@ -241,7 +300,13 @@ public:
 
 						enemyCount++;
 						enemyExplosionTime = totalTime;
-
+						
+						if (enemyCount % 2 == 0) {
+							bBox = true;
+							boxX = rand() % (400 - boxDimX);
+							boxY = rand() % (400 - boxDimY);
+							boxSprite = new olc::Sprite("Sprites/box.png");
+						}
 
 						delete enemySprite;
 						delete rBulletSprite;
@@ -255,19 +320,7 @@ public:
 						DrawSprite(explosionX, explosionY, explosionSprite, 1);
 					}
 			}
-
-
-			if (!bEnemy)
-			{
-				bEnemy = 1;
-				enemyY = rand() % (400 - enemyDimY);
-				enemyX = 400;
-				enemySprite = new olc::Sprite("Sprites/enemy.png");
-				DrawSprite(enemyX, enemyY, enemySprite, 1);
-			}
-
-
-
+			
 			if (bExplosion)
 			{
 				if (totalTime - enemyExplosionTime > 0.5)
@@ -278,9 +331,6 @@ public:
 				else
 					DrawSprite(explosionX, explosionY, explosionSprite, 2);
 			}
-
-			DrawSprite(shipX, shipY, shipSprite, 1);
-
 
 			if (bBullet)
 			{
@@ -293,39 +343,22 @@ public:
 					delete rBulletSprite;
 				}
 			}
+			
+			if (GetMouse(0).bPressed) {
+				if (GetMouseX() >= boxX && GetMouseX() <= boxX + boxDimX &&
+					GetMouseY() >= boxY && GetMouseY() <= boxY + boxDimY) 
+				{
+					nuclear = true;
+					bBox = false;
+					delete boxSprite;
+				}
+			}
+
+			// gemi yaratiliyor
+			DrawSprite(shipX, shipY, shipSprite, 1);
 
 
 			// Ship movement
-			//if (GetKey(olc::W).bHeld && GetKey(olc::A).bHeld) // upper left
-			//{
-			//	shipX -= shipSpeed * fElapsedTime;
-			//	shipY -= shipSpeed * fElapsedTime;
-
-			//	if (shipX <= 0)
-			//	{
-			//		shipX = 0;
-			//	}
-			//	else if (shipY <= 0)
-			//	{
-			//		shipY = 0;
-			//	}
-
-			//}
-			//else if (GetKey(olc::W).bHeld && GetKey(olc::D).bHeld) // upper right
-			//{
-			//	shipX += shipSpeed * fElapsedTime;
-			//	shipY -= shipSpeed * fElapsedTime;
-			//}
-			//else if (GetKey(olc::S).bHeld && GetKey(olc::A).bHeld) // lower left
-			//{
-			//	shipX -= shipSpeed * fElapsedTime;
-			//	shipY += shipSpeed * fElapsedTime;
-			//}
-			//else if (GetKey(olc::S).bHeld && GetKey(olc::D).bHeld) // lower right
-			//{
-			//	shipX += shipSpeed * fElapsedTime;
-			//	shipY += shipSpeed * fElapsedTime;
-			//}
 			if (GetKey(olc::W).bHeld) // up
 			{
 				shipY -= shipSpeed * fElapsedTime;
@@ -364,8 +397,8 @@ public:
 
 int main()
 {
-	Example demo;
-	if (demo.Construct(400, 400, 2, 2))
-		demo.Start();
+	SpaceGame game;
+	if (game.Construct(400, 400, 1, 1))
+		game.Start();
 	return 0;
 }
