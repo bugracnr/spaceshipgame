@@ -13,7 +13,7 @@
 
 
 
-class Example : public olc::PixelGameEngine
+class SpaceGame : public olc::PixelGameEngine
 {
 	olc::Sprite* shipSprite;
 	olc::Sprite* enemySprite;
@@ -103,6 +103,8 @@ public:
 
 			DrawString(50, 250, "PRESS E TO EXIT");
 
+			delete shipSprite;
+
 			if (GetKey(olc::E).bPressed)
 				return false;
 			else
@@ -129,6 +131,15 @@ public:
 
 
 			// if there exists an asteroid
+			if (!bAsteroid)
+			{
+				bAsteroid = true;
+				asteroidY = rand() % (400 - asteroidDimY);
+				asteroidX = 400;
+				asteroidSprite = new olc::Sprite("Sprites/asteroid.png");
+				DrawSprite(asteroidX, asteroidY, asteroidSprite, 1);
+			}
+
 			if (bAsteroid)
 			{
 				// collision 
@@ -175,7 +186,7 @@ public:
 
 
 						// draw explosion
-						bAstExplosion = 1;
+						bAstExplosion = true;
 
 						astExplosionX = asteroidX;
 						astExplosionY = asteroidY;
@@ -191,10 +202,20 @@ public:
 				if (totalTime - asteroidExplosionTime > 0.5)
 				{
 					delete astExpSprite;
-					bAstExplosion = 0;
+					bAstExplosion = false;
 				}
 				else
 					DrawSprite(astExplosionX, astExplosionY, astExpSprite, 1);
+			}
+						
+		
+			if (!bEnemy)
+			{
+				bEnemy = true;
+				enemyY = rand() % (400 - enemyDimY);
+				enemyX = 400;
+				enemySprite = new olc::Sprite("Sprites/enemy.png");
+				DrawSprite(enemyX, enemyY, enemySprite, 1);
 			}
 
 			if (bEnemy)
@@ -210,23 +231,15 @@ public:
 					gameOver = 1;
 				}
 
+
 				DrawSprite(enemyX, enemyY, enemySprite, 1);
 
-
-				if (enemyX < double(rand() % 400) && bAsteroid == 0)
-				{
-					bAsteroid = 1;					
-					asteroidY = rand() % (400 - asteroidDimY);
-					asteroidX = 400;
-					asteroidSprite = new olc::Sprite("Sprites/asteroid.png");
-					DrawSprite(asteroidX, asteroidY, asteroidSprite, 1);
-				}
-
-
-				if (enemyX <= -2 * enemyDimX)
+	
+				
+				if (enemyX <=  - 2* enemyDimX)
 				{
 					delete enemySprite;
-					bEnemy = 0;
+					bEnemy = false;
 				}
 
 				if (bBullet)
@@ -255,19 +268,7 @@ public:
 						DrawSprite(explosionX, explosionY, explosionSprite, 1);
 					}
 			}
-
-
-			if (!bEnemy)
-			{
-				bEnemy = 1;
-				enemyY = rand() % (400 - enemyDimY);
-				enemyX = 400;
-				enemySprite = new olc::Sprite("Sprites/enemy.png");
-				DrawSprite(enemyX, enemyY, enemySprite, 1);
-			}
-
-
-
+			
 			if (bExplosion)
 			{
 				if (totalTime - enemyExplosionTime > 0.5)
@@ -278,9 +279,6 @@ public:
 				else
 					DrawSprite(explosionX, explosionY, explosionSprite, 2);
 			}
-
-			DrawSprite(shipX, shipY, shipSprite, 1);
-
 
 			if (bBullet)
 			{
@@ -293,6 +291,12 @@ public:
 					delete rBulletSprite;
 				}
 			}
+			
+
+			// gemi yaratiliyor
+			DrawSprite(shipX, shipY, shipSprite, 1);
+
+				
 
 
 			// Ship movement
@@ -334,8 +338,8 @@ public:
 
 int main()
 {
-	Example demo;
-	if (demo.Construct(400, 400, 2, 2))
-		demo.Start();
+	SpaceGame game;
+	if (game.Construct(400, 400, 1, 1))
+		game.Start();
 	return 0;
 }
