@@ -296,36 +296,6 @@ public:
 
 
 			// Ship movement
-			//if (GetKey(olc::W).bHeld && GetKey(olc::A).bHeld) // upper left
-			//{
-			//	shipX -= shipSpeed * fElapsedTime;
-			//	shipY -= shipSpeed * fElapsedTime;
-
-			//	if (shipX <= 0)
-			//	{
-			//		shipX = 0;
-			//	}
-			//	else if (shipY <= 0)
-			//	{
-			//		shipY = 0;
-			//	}
-
-			//}
-			//else if (GetKey(olc::W).bHeld && GetKey(olc::D).bHeld) // upper right
-			//{
-			//	shipX += shipSpeed * fElapsedTime;
-			//	shipY -= shipSpeed * fElapsedTime;
-			//}
-			//else if (GetKey(olc::S).bHeld && GetKey(olc::A).bHeld) // lower left
-			//{
-			//	shipX -= shipSpeed * fElapsedTime;
-			//	shipY += shipSpeed * fElapsedTime;
-			//}
-			//else if (GetKey(olc::S).bHeld && GetKey(olc::D).bHeld) // lower right
-			//{
-			//	shipX += shipSpeed * fElapsedTime;
-			//	shipY += shipSpeed * fElapsedTime;
-			//}
 			if (GetKey(olc::W).bHeld) // up
 			{
 				shipY -= shipSpeed * fElapsedTime;
