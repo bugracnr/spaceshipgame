@@ -1,9 +1,9 @@
 #include"olcSimpleEngine.h"
 
 /*
-	INSTRUCTIONS: 
+	INSTRUCTIONS:
 
-	Controls: W,A,S,D 
+	Controls: W,A,S,D
 
 	Shoot: SPACE
 
@@ -38,6 +38,8 @@ class SpaceGame : public olc::PixelGameEngine
 	bool nuclear = false;
 	int boxDimX = 30;
 	int boxDimY = 20;
+	int boxCount = 0;
+	int nuclearCount = 0;
 
 
 	// bullet
@@ -86,7 +88,7 @@ class SpaceGame : public olc::PixelGameEngine
 public:
 	bool OnUserCreate() //override
 	{
-		shipSprite = new olc::Sprite("Sprites/spaceship.png");		
+		shipSprite = new olc::Sprite("Sprites/spaceship.png");
 		boxSprite = new olc::Sprite("Sprites/box.png");
 		return true;
 	}
@@ -101,11 +103,18 @@ public:
 		{
 			DrawString(50, 50, "GAME OVER");
 
-			DrawString(50, 100, "ASTEROIDS HIT: " + std::to_string(asteroidCount));
+			DrawString(50, 75, "ASTEROIDS HIT: " + std::to_string(asteroidCount));
 
-			DrawString(50, 150, "ENEMIES HIT: " + std::to_string(enemyCount));
+			DrawString(50, 100, "ENEMIES HIT: " + std::to_string(enemyCount));
 
-			DrawString(50, 200, "YOU HAVE SURVIVED " + std::to_string(totalTime) + " SECONDS");
+			DrawString(50, 125, "BOXES COLLECTED: " + std::to_string(boxCount));
+
+			DrawString(50, 150, "NUCLEAR BLASTS PERFORMED: " + std::to_string(nuclearCount));
+
+			DrawString(50, 175, "YOU HAVE SURVIVED " + std::to_string(totalTime) + " SECONDS");
+
+			DrawString(50, 200, "TOTAL SCORE: " + std::to_string(asteroidCount * 3 + enemyCount * 5
+				+ boxCount * 3 + nuclearCount * 4 + int(totalTime)));
 
 			DrawString(50, 250, "PRESS E TO EXIT");
 
@@ -122,26 +131,38 @@ public:
 		else // gameplay
 		{
 			totalTime += fElapsedTime;
-
-
-			// The following keeps the ship on the screen
-			if (shipX <= 0)
-				shipX = 0;
-
-
-			if (shipX >= 400 - shipDimX)
-				shipX = 400 - shipDimX;
-
-			if (shipY <= 0)
-				shipY = 0;
-
-			if (shipY >= 400 - shipDimY)
-				shipY = 400 - shipDimY;
-
-
+			
 			// if there exists a box
 			if (bBox) {
+
 				DrawSprite(boxX, boxY, boxSprite, 1);
+
+
+				if (GetMouse(0).bPressed) {
+					if (GetMouseX() >= boxX && GetMouseX() <= boxX + boxDimX &&
+						GetMouseY() >= boxY && GetMouseY() <= boxY + boxDimY)
+					{
+						boxCount++;
+						nuclear = true;
+						bBox = false;
+						delete boxSprite;
+					}
+				}
+
+				// hit the box to collect
+				if (shipY > boxY - shipDimY + 1 &&
+					shipY < boxY + boxDimY + shipDimY - 1 &&
+					shipX > boxX - shipDimX + 1 &&
+					shipX < boxX + boxDimX - shipDimX)
+				{
+					boxCount++;
+					nuclear = true;
+					bBox = false;
+					delete boxSprite;
+				}
+
+
+
 			}
 
 			if (nuclear) {
@@ -150,6 +171,7 @@ public:
 				DrawString(75, 30, "Press 'shift' to kill'em all");
 
 				if (GetKey(olc::SHIFT).bPressed) {
+					nuclearCount++;
 					if (bAsteroid) {
 						bAsteroid = false;
 						delete asteroidSprite;
@@ -200,7 +222,7 @@ public:
 
 				// position update
 				asteroidX -= fElapsedTime * asteroidSpeed;
-				
+
 				// Draw asteroid
 				DrawSprite(asteroidX, asteroidY, asteroidSprite, 1);
 
@@ -254,8 +276,8 @@ public:
 				else
 					DrawSprite(astExplosionX, astExplosionY, astExpSprite, 1);
 			}
-						
-		
+
+
 			if (!bEnemy)
 			{
 				bEnemy = true;
@@ -281,9 +303,9 @@ public:
 
 				DrawSprite(enemyX, enemyY, enemySprite, 1);
 
-	
-				
-				if (enemyX <=  - 2* enemyDimX)
+
+
+				if (enemyX <= -2 * enemyDimX)
 				{
 					delete enemySprite;
 					bEnemy = false;
@@ -301,7 +323,7 @@ public:
 
 						enemyCount++;
 						enemyExplosionTime = totalTime;
-						
+
 						if (enemyCount % 2 == 0) {
 							bBox = true;
 							boxX = rand() % (400 - boxDimX);
@@ -321,7 +343,7 @@ public:
 						DrawSprite(explosionX, explosionY, explosionSprite, 1);
 					}
 			}
-			
+
 			if (bExplosion)
 			{
 				if (totalTime - enemyExplosionTime > 0.5)
@@ -344,20 +366,19 @@ public:
 					delete rBulletSprite;
 				}
 			}
-			
 
-			if (GetMouse(0).bPressed) {
-				if (GetMouseX() >= boxX && GetMouseX() <= boxX + boxDimX &&
-					GetMouseY() >= boxY && GetMouseY() <= boxY + boxDimY) 
+			if (!bBullet)
+			{
+				// ship can fire
+				if (GetKey(olc::SPACE).bPressed)
 				{
-					nuclear = true;
-					bBox = false;
-					delete boxSprite;
+					bBullet = 1;
+					rBulletX = shipX + 10;
+					rBulletY = shipY + 10;
+					rBulletSprite = new olc::Sprite("Sprites/rbullet.png");
+					DrawSprite(rBulletX, rBulletY, rBulletSprite, 2);
 				}
 			}
-
-			// gemi yaratiliyor
-			DrawSprite(shipX, shipY, shipSprite, 1);
 
 
 
@@ -380,18 +401,23 @@ public:
 			}
 
 
-			if (!bBullet)
-			{
-				// ship can fire
-				if (GetKey(olc::SPACE).bPressed)
-				{
-					bBullet = 1;
-					rBulletX = shipX + 10;
-					rBulletY = shipY + 10;
-					rBulletSprite = new olc::Sprite("Sprites/rbullet.png");
-					DrawSprite(rBulletX, rBulletY, rBulletSprite, 2);
-				}
-			}
+			// The following keeps the ship on the screen
+			if (shipX <= 0)
+				shipX = 0;
+
+
+			if (shipX >= 400 - shipDimX)
+				shipX = 400 - shipDimX;
+
+			if (shipY <= 0)
+				shipY = 0;
+
+			if (shipY >= 400 - shipDimY)
+				shipY = 400 - shipDimY;
+
+
+			// draw ship
+			DrawSprite(shipX, shipY, shipSprite, 1);						
 
 			return true;
 		}
