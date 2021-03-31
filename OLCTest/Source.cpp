@@ -16,6 +16,7 @@
 class SpaceGame : public olc::PixelGameEngine
 {
 	olc::Sprite* shipSprite;
+	olc::Sprite* boxSprite;
 	olc::Sprite* enemySprite;
 	olc::Sprite* asteroidSprite;
 	olc::Sprite* rBulletSprite;
@@ -31,6 +32,12 @@ class SpaceGame : public olc::PixelGameEngine
 	int shipDimX = 23;
 	int shipDimY = 25;
 
+	// box
+	double boxX, boxY;
+	bool bBox = false;
+	bool nuclear = false;
+	int boxDimX = 30;
+	int boxDimY = 20;
 
 
 	// bullet
@@ -80,7 +87,7 @@ public:
 	bool OnUserCreate() //override
 	{
 		shipSprite = new olc::Sprite("Sprites/spaceship.png");		
-
+		boxSprite = new olc::Sprite("Sprites/box.png");
 		return true;
 	}
 	bool OnUserUpdate(float fElapsedTime) //override
@@ -89,7 +96,6 @@ public:
 		Clear(olc::DARK_GREEN);
 		SetPixelMode(olc::Pixel::ALPHA);
 		//Drawing the background
-
 
 		if (gameOver) // game over screen
 		{
@@ -103,7 +109,10 @@ public:
 
 			DrawString(50, 250, "PRESS E TO EXIT");
 
-			delete shipSprite;
+			// Throws exception when ship crashes 
+			// delete shipSprite;
+			// Throws exception when ship crashes 
+
 
 			if (GetKey(olc::E).bPressed)
 				return false;
@@ -129,6 +138,44 @@ public:
 			if (shipY >= 400 - shipDimY)
 				shipY = 400 - shipDimY;
 
+
+			// if there exists a box
+			if (bBox) {
+				DrawSprite(boxX, boxY, boxSprite, 1);
+			}
+
+			if (nuclear) {
+
+				DrawString(80, 10, "Nuclear weapon is activated");
+				DrawString(75, 30, "Press 'shift' to kill'em all");
+
+				if (GetKey(olc::SHIFT).bPressed) {
+					if (bAsteroid) {
+						bAsteroid = false;
+						delete asteroidSprite;
+						bAstExplosion = true;
+						asteroidExplosionTime = totalTime;
+						astExplosionX = asteroidX;
+						astExplosionY = asteroidY;
+
+						astExpSprite = new olc::Sprite("Sprites/exp2.png");
+						DrawSprite(astExplosionX, astExplosionY, astExpSprite, 1);
+					}
+
+					if (bEnemy) {
+						bEnemy = false;
+						delete enemySprite;
+						bExplosion = true;
+						enemyExplosionTime = totalTime;
+						explosionX = enemyX;
+						explosionY = enemyY;
+
+						explosionSprite = new olc::Sprite("Sprites/explosion.png");
+						DrawSprite(explosionX, explosionY, explosionSprite, 1);
+					}
+					nuclear = false;
+				}
+			}
 
 			// if there exists an asteroid
 			if (!bAsteroid)
@@ -228,7 +275,7 @@ public:
 					shipX > enemyX - shipDimX + 1 &&
 					shipX < enemyX + enemyDimX - shipDimX)
 				{
-					gameOver = 1;
+					gameOver = true;
 				}
 
 
@@ -254,7 +301,13 @@ public:
 
 						enemyCount++;
 						enemyExplosionTime = totalTime;
-
+						
+						if (enemyCount % 2 == 0) {
+							bBox = true;
+							boxX = rand() % (400 - boxDimX);
+							boxY = rand() % (400 - boxDimY);
+							boxSprite = new olc::Sprite("Sprites/box.png");
+						}
 
 						delete enemySprite;
 						delete rBulletSprite;
@@ -293,10 +346,19 @@ public:
 			}
 			
 
+			if (GetMouse(0).bPressed) {
+				if (GetMouseX() >= boxX && GetMouseX() <= boxX + boxDimX &&
+					GetMouseY() >= boxY && GetMouseY() <= boxY + boxDimY) 
+				{
+					nuclear = true;
+					bBox = false;
+					delete boxSprite;
+				}
+			}
+
 			// gemi yaratiliyor
 			DrawSprite(shipX, shipY, shipSprite, 1);
 
-				
 
 
 			// Ship movement
