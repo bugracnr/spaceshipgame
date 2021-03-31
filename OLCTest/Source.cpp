@@ -113,6 +113,7 @@ public:
 			// delete shipSprite;
 			// Throws exception when ship crashes 
 
+
 			if (GetKey(olc::E).bPressed)
 				return false;
 			else
@@ -344,6 +345,7 @@ public:
 				}
 			}
 			
+
 			if (GetMouse(0).bPressed) {
 				if (GetMouseX() >= boxX && GetMouseX() <= boxX + boxDimX &&
 					GetMouseY() >= boxY && GetMouseY() <= boxY + boxDimY) 
@@ -356,6 +358,7 @@ public:
 
 			// gemi yaratiliyor
 			DrawSprite(shipX, shipY, shipSprite, 1);
+
 
 
 			// Ship movement
