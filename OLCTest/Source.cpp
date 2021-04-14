@@ -179,7 +179,8 @@ public:
 						}
 
 						// hit the box to collect
-						if (shipX + shipDimX > boxX &&
+						if (//top right hit
+							shipX + shipDimX > boxX &&
 							shipX + shipDimX < boxX + boxDimX &&
 							shipY > boxY &&
 							shipY < boxY + boxDimY
