@@ -179,18 +179,22 @@ public:
 						}
 
 						// hit the box to collect
-						if (shipY > boxY - shipDimY + 1 &&
-							shipY < boxY + boxDimY + shipDimY - 1 &&
-							shipX > boxX - shipDimX + 1 &&
-							shipX < boxX + boxDimX - shipDimX)
+						if (shipX + shipDimX > boxX &&
+							shipX + shipDimX < boxX + boxDimX &&
+							shipY > boxY &&
+							shipY < boxY + boxDimY
+							||
+							// bottom right hit
+							shipX + shipDimX > boxX &&
+							shipX + shipDimX < boxX + boxDimX &&
+							shipY + shipDimY > boxY &&
+							shipY + shipDimY < boxY + boxDimY)
 						{
 							boxCount++;
 							nuclear = true;
 							bBox = false;
 							delete boxSprite;
 						}
-
-
 
 					}
 
@@ -241,10 +245,17 @@ public:
 					if (bAsteroid)
 					{
 						// collision 
-						if (shipY > asteroidY - shipDimY + 1 &&
-							shipY < asteroidY + asteroidDimY + shipDimY - 1 &&
-							shipX > asteroidX - shipDimX + 1 &&
-							shipX < asteroidX + asteroidDimX - shipDimX)
+						if (// top right hit
+							shipX + shipDimX > asteroidX &&
+							shipX + shipDimX < asteroidX + asteroidDimX &&
+							shipY > asteroidY &&
+							shipY < asteroidY + asteroidDimY
+							||
+							// bottom right hit
+							shipX + shipDimX > asteroidX &&
+							shipX + shipDimX < asteroidX + asteroidDimX &&
+							shipY + shipDimY > asteroidY &&
+							shipY + shipDimY < asteroidY + asteroidDimY)
 						{
 							gameOver = 1;
 						}
@@ -267,10 +278,19 @@ public:
 
 						if (bBullet)
 							// bullet hits the asteroid
-							if (rBulletY > asteroidY - bulletDimY + 1 &&
-								rBulletY < asteroidY + asteroidDimX + bulletDimY - 1 &&
-								rBulletX > asteroidX - bulletDimX + 1 &&
-								rBulletX < asteroidX + asteroidDimX - bulletDimX)
+							if (
+								// top right hit
+								rBulletX + bulletDimX > asteroidX &&
+								rBulletX + bulletDimX < asteroidX + asteroidDimX &&
+								rBulletY > asteroidY &&
+								rBulletY < asteroidY + asteroidDimY
+								||
+								// bottom right hit
+								rBulletX + bulletDimX > asteroidX &&
+								rBulletX + bulletDimX < asteroidX + asteroidDimX &&
+								rBulletY + bulletDimY> asteroidY &&
+								rBulletY + bulletDimY < asteroidY + asteroidDimY
+								)
 							{
 								bBullet = 0;
 								bAsteroid = 0;
@@ -321,10 +341,17 @@ public:
 						enemyX -= fElapsedTime * enemySpeed;
 
 						// crash
-						if (shipY > enemyY - shipDimY + 1 &&
-							shipY < enemyY + enemyDimY + shipDimY - 1 &&
-							shipX > enemyX - shipDimX + 1 &&
-							shipX < enemyX + enemyDimX - shipDimX)
+						if (// top right hit
+							shipX + shipDimX > enemyX &&
+							shipX + shipDimX < enemyX + enemyDimX &&
+							shipY > enemyY &&
+							shipY < enemyY + enemyDimY
+							||
+							// bottom right hit
+							shipX + shipDimX > enemyX &&
+							shipX + shipDimX < enemyX + enemyDimX &&
+							shipY + shipDimY > enemyY &&
+							shipY + shipDimY < enemyY + enemyDimY)
 						{
 							gameOver = true;
 						}
@@ -342,10 +369,17 @@ public:
 
 						if (bBullet)
 							// bullet hits
-							if (rBulletY > enemyY - bulletDimY + 1 &&
-								rBulletY < enemyY + enemyDimY + bulletDimY - 1 &&
-								rBulletX > enemyX - bulletDimX + 1 &&
-								rBulletX < enemyX + enemyDimX - bulletDimX)
+							if (// top right hit
+								rBulletX + bulletDimX > enemyX &&
+								rBulletX + bulletDimX < enemyX + enemyDimX &&
+								rBulletY > enemyY &&
+								rBulletY < enemyY + enemyDimY
+								||
+								// bottom right hit
+								rBulletX + bulletDimX > enemyX &&
+								rBulletX + bulletDimX < enemyX + enemyDimX &&
+								rBulletY + bulletDimY > enemyY &&
+								rBulletY + bulletDimY < enemyY + enemyDimY)
 							{
 								bBullet = 0;
 								bEnemy = 0;
@@ -476,6 +510,7 @@ public:
 		}
 	}
 };
+
 
 int main()
 {
